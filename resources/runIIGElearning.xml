@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite  name="OrangeHRM">
+    <listeners>
+        <listener class-name="org.uncommons.reportng.HTMLReporter"/>
+        <listener class-name="org.uncommons.reportng.JUnitXMLReporter"/>
+    </listeners>
+    <test name="Run On FIREFOX">
+        <parameter name = "browser" value = "firefox"/>
+        <classes>
+            <class name="com.IIGElearning.Register"/>
+
+        </classes>
+    </test>
+</suite>
