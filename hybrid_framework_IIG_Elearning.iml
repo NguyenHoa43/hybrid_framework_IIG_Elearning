@@ -16,5 +16,6 @@
     <orderEntry type="library" name="commons-codec-1.11" level="project" />
     <orderEntry type="library" name="selenium-server-4.18.1" level="project" />
     <orderEntry type="library" name="guava-25.0-jre" level="project" />
+    <orderEntry type="library" name="bcpkix-jdk18on-1.76" level="project" />
   </component>
 </module>

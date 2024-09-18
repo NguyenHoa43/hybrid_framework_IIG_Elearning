@@ -1,7 +1,9 @@
 package commons;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -19,7 +21,7 @@ import java.util.Random;
 
 public class BaseTest {
 
-    private WebDriver driverBaseTest;
+    private WebDriver driver;
     protected final Log log;
 
     @BeforeSuite
@@ -31,55 +33,35 @@ public class BaseTest {
     }
 
     protected WebDriver getBrowserDriver(String browserName) {
-        if (browserName.equals("firefox")) {
-
-            driverBaseTest = new FirefoxDriver();
-        } else if (browserName.equals("headlessfirefox")) {
-
-            FirefoxOptions options = new FirefoxOptions();
-            options.addArguments("--headless");
-            options.addArguments("window-size=1920x1080");
-            driverBaseTest = new FirefoxDriver(options);
-        } else if (browserName.equals("coccoc")) {
-
-            ChromeOptions options = new ChromeOptions();
-            if (GlobalConstants.OS_NAME.startsWith("Windows")) {
-                options.setBinary("C:\\Program Files\\CocCoc\\Browser\\Application\\browser.exe");
-            } else {
-                options.setBinary(".....");
-            }
-            driverBaseTest = new ChromeDriver(options);
-        } else if (browserName.equals("chrome")) {
-
-            driverBaseTest = new ChromeDriver();
-        } else if (browserName.equals("headlesschrome")) {
-
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("--headless");
-            options.addArguments("window-size=1920x1080");
-            driverBaseTest = new ChromeDriver(options);
-
-        } else if (browserName.equals("edge")) {
-
-            driverBaseTest = new EdgeDriver();
-        } else {
-            throw new RuntimeException("Browser name invalid !");
+        BrowserList browserList = BrowserList.valueOf(browserName.toUpperCase());
+        switch (browserList) {
+            case CHROME:
+                driver = WebDriverManager.chromedriver().create();
+                break;
+            case FIREFOX:
+                driver = WebDriverManager.firefoxdriver().create();
+                break;
+            case EDGE:
+                driver = WebDriverManager.edgedriver().create();
+                break;
+            default:
+                throw new RuntimeException("Browser name is not valid");
         }
-        driverBaseTest.manage().timeouts().implicitlyWait(Duration.ofSeconds(GlobalConstants.LONG_TIME_OUT));
-        driverBaseTest.get(GlobalConstants.PAGE_URL);
-        return driverBaseTest;
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(GlobalConstants.LONG_TIME_OUT));
+        driver.get(GlobalConstants.PAGE_URL);
+        return driver;
     }
 
     protected WebDriver getBrowserDriver(String browserName, String appURL) {
         if (browserName.equals("firefox")) {
 
-            driverBaseTest = new FirefoxDriver();
+            driver = new FirefoxDriver();
         } else if (browserName.equals("headlessfirefox")) {
 
             FirefoxOptions options = new FirefoxOptions();
             options.addArguments("--headless");
             options.addArguments("window-size=1920x1080");
-            driverBaseTest = new FirefoxDriver(options);
+            driver = new FirefoxDriver(options);
         } else if (browserName.equals("coccoc")) {
 
             ChromeOptions options = new ChromeOptions();
@@ -88,26 +70,26 @@ public class BaseTest {
             } else {
                 options.setBinary(".....");
             }
-            driverBaseTest = new ChromeDriver(options);
+            driver = new ChromeDriver(options);
         } else if (browserName.equals("chrome")) {
 
-            driverBaseTest = new ChromeDriver();
+            driver = new ChromeDriver();
         } else if (browserName.equals("headlesschrome")) {
 
             ChromeOptions options = new ChromeOptions();
             options.addArguments("--headless");
             options.addArguments("window-size=1920x1080");
-            driverBaseTest = new ChromeDriver(options);
+            driver = new ChromeDriver(options);
 
         } else if (browserName.equals("edge")) {
 
-            driverBaseTest = new EdgeDriver();
+            driver = new EdgeDriver();
         } else {
             throw new RuntimeException("Browser name invalid !");
         }
-        driverBaseTest.manage().timeouts().implicitlyWait(Duration.ofSeconds(GlobalConstants.LONG_TIME_OUT));
-        driverBaseTest.get(appURL);
-        return driverBaseTest;
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(GlobalConstants.LONG_TIME_OUT));
+        driver.get(appURL);
+        return driver;
     }
 
     protected int fadeNumber() {
@@ -116,7 +98,7 @@ public class BaseTest {
     }
 
     public WebDriver getDriverInstance() {
-        return this.driverBaseTest;
+        return this.driver;
     }
 
     protected boolean verifyTrue(boolean condition) {
@@ -183,7 +165,7 @@ public class BaseTest {
             String osName = System.getProperty("os.name").toLowerCase();
             log.info("OS name = " + osName);
 
-            String driverInstanceName = driverBaseTest.toString().toLowerCase();
+            String driverInstanceName = driver.toString().toLowerCase();
             log.info("Driver instance name = " + driverInstanceName);
 
             String browserDriverName = null;
@@ -208,9 +190,9 @@ public class BaseTest {
                 cmd = "pkill " + browserDriverName;
             }
 
-            if (driverBaseTest != null) {
-                driverBaseTest.manage().deleteAllCookies();
-                driverBaseTest.quit();
+            if (driver != null) {
+                driver.manage().deleteAllCookies();
+                driver.quit();
             }
         } catch (Exception e) {
             log.info(e.getMessage());
